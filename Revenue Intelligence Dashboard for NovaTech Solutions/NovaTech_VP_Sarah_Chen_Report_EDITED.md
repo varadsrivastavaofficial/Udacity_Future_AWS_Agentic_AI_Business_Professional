@@ -1,6 +1,4 @@
-from pathlib import Path
-
-report = """# NovaTech Solutions — Revenue Intelligence Report
+# NovaTech Solutions — Revenue Intelligence Report
 
 **Prepared for:** Sarah Chen, VP  
 **Prepared by:** Varad Srivastava  
@@ -10,15 +8,17 @@ report = """# NovaTech Solutions — Revenue Intelligence Report
 
 The Revenue Intelligence dashboard brings together NovaTech's marketing, sales, and customer-support information into three interactive views: **Marketing Funnel**, **Sales Pipeline**, and **Customer Health**. The dashboard is designed to support management decisions around marketing efficiency, sales performance, and customer health.
 
-The analysis combines a unified account-level dataset with the raw Marketing and Support datasets where campaign- or ticket-level detail is required. Quick Chat (Q) complements the dashboard by allowing natural-language questions and ad-hoc exploration.
+The analysis combines an account-level dataset with the raw Marketing and Support datasets where campaign- or ticket-level detail is required. **Customer relationship management (CRM)** data records sales opportunities and their outcomes. Quick Chat (Q) complements the dashboard by allowing natural-language questions and ad-hoc exploration.
 
 ## 2. Data Strategy
 
 The CRM dataset contains **499 opportunities**, including **315 Won** and **184 Lost** outcomes. The Marketing dataset contains **2,240 leads**, including **609 responses**, giving an overall response rate of approximately **27.2%**. The Support dataset contains **3,000 tickets**.
 
-Marketing and Support data were aggregated by `account_id` to create account-level measures. Marketing aggregation produced lead count, total campaign spend, and total marketing revenue. Support aggregation produced support-ticket count and average resolution time.
+Marketing and Support data were aggregated by `account_id` to create account-level measures. **Account-level aggregation** means combining multiple records belonging to the same customer account into summary measures for that account. For example, Marketing records were summarised into lead count, total campaign spend, and total marketing revenue, while Support records were summarised into support-ticket count and average resolution time.
 
-The CRM data was enhanced with calculated fields for **Won Deal Revenue** and **High Value Deal Flag**. The resulting account-level information was joined using `account_id`.
+`account_id` is the business identifier used to recognise the same customer account across the different source datasets and connect its sales, marketing, and support information.
+
+The CRM data was enhanced with calculated fields for **Won Deal Revenue** and **High Value Deal Flag**. The resulting information was joined using `account_id`.
 
 The raw Marketing and Support datasets were also retained in the analysis. This was important because aggregation can remove detailed dimensions such as campaign channel, funnel stage, ticket priority, product area, and customer sentiment. Retaining the raw datasets allowed these dimensions to be analysed directly in the dashboard.
 
@@ -49,7 +49,7 @@ The combination of support activity and commercial information is intended to he
 - NovaPulse Professional has the highest total deal value at **$208,724**, while NovaEdge Lite has **$3,251**.
 - Enterprise companies have the highest average deal value at **$1,589.17**, compared with **$1,353.30** for Medium companies.
 - NovaPulse Ultimate has the longest average closing time at **99.5 days**, compared with **60.42 days** for NovaPulse Professional.
-- Budget Constraints is the least common loss reason with **31 occurrences**, followed by Timing Not Right with **33**.
+- Budget Constraints accounts for **31** loss occurrences, while Timing Not Right accounts for **33**.
 
 **Recommended action:** Prioritise high-value Enterprise opportunities and investigate the longer sales cycle for NovaPulse Ultimate to identify potential process or product-related delays.
 
@@ -76,11 +76,11 @@ The combination of support activity and commercial information is intended to he
 
 Quick Chat was used to explore the data using natural-language questions. A **Topic** is the semantic layer that provides Q with the data fields and business context it can use to interpret questions.
 
-The initial Topic configuration relied on the unified account-level dataset. This worked well for questions based on account-level measures, but it limited questions requiring fields that had been removed through aggregation. In particular, campaign-channel conversion and ticket-priority resolution questions were initially difficult because fields such as `campaign_channel` and `priority` were not available at the required level of detail.
+The saved Topic, **NovaTech Revenue Intelligence**, contains the unified account-level dataset. This configuration works well for questions based on account-level measures such as deal counts, average deal value by company size, total support tickets, marketing spend, and account-level support volume.
 
-After Topic configuration and the availability of the relevant datasets, Q was able to answer the exploration questions more effectively. For example, Q identified Direct Mail as the highest-converting channel at **53.02%**, reported the average deal values by company size, and identified YieldMax Software as the highest-support-volume account.
+The account-level Topic has an important limitation: fields that were removed through aggregation, such as `campaign_channel` and `priority`, are not available for every question. As a result, questions requiring campaign-channel conversion rates or ticket-priority breakdowns cannot be answered from the unified Topic alone. The raw Marketing and Support datasets remain necessary for those detailed dashboard analyses.
 
-The Q exploration also highlighted the importance of validating AI-generated answers against the dashboard. For the top-account question, Q correctly identified YieldMax Software's **334 support tickets**, but its reported won-deal revenue of **$40,722** differed from the dashboard's **$25,791**. This is recorded as a partial match rather than treating the AI output as automatically correct.
+Fresh Topic testing confirmed that Q could answer questions such as the number of CRM deals (**499**), average deal value by company size, and the accounts with the highest support-ticket volume. These responses were cross-checked against the dashboard.
 
 ## 6. AI Analysis vs. Dashboard
 
@@ -88,15 +88,10 @@ Q and the dashboard generally agreed on findings that could be directly supporte
 
 Q is more useful for rapid, natural-language exploration and ad-hoc questions. The dashboard is more appropriate for recurring management reporting and visual decision-making.
 
-The difference in the YieldMax deal-revenue result demonstrates why AI analysis should be cross-checked against the underlying dashboard. Q can accelerate investigation, but dashboard and dataset validation remains important when an answer depends on aggregation or joins.
+The Q exploration also demonstrated the importance of validating AI-generated answers against the dashboard. For the top-account question, Q correctly identified YieldMax Software with **334 support tickets**, but its reported won-deal revenue of **$40,722** differed from the dashboard's account-level value of **$25,791**. This is recorded as a **partial match**, rather than treating the AI output as automatically correct. The difference should be validated against the underlying opportunity-level CRM records before being used for a financial decision.
 
 ## 7. Conclusion
 
 The Revenue Intelligence dashboard provides a consolidated management view of NovaTech's marketing efficiency, sales pipeline, and customer health. The combination of interactive dashboards, Quick Chat, Topic configuration, and data validation supports both recurring management reporting and flexible business-question exploration.
 
 The main opportunities identified are to improve marketing-spend efficiency, investigate high-support-volume accounts and product areas, and focus sales attention on higher-value opportunities while examining longer sales cycles.
-"""
-
-path = Path("/mnt/data/NovaTech_VP_Sarah_Chen_Final_Report.md")
-path.write_text(report, encoding="utf-8")
-print(path)
